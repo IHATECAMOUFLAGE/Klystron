@@ -75,9 +75,9 @@
 
       const target = isFullUrl(value)
         ? value
-        : 'https://www.google.com/search?q=' + encodeURIComponent(value);
+        : 'https://bing.com/search?q=' + encodeURIComponent(value);
 
-      window.location.href = '/klystron?url=' + encodeURIComponent(target);
+      window.location.href = '/klystron/' + encodeURIComponent(target);
     });
   </script>
 </body>

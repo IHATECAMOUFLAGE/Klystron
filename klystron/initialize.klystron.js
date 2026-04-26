@@ -13,7 +13,7 @@ const __dirname = path.dirname(__filename);
 const publicDir = path.join(__dirname, '..', 'public');
 const app = fastify({
     routerOptions: {
-        maxParamLength: 10000
+        maxParamLength: 500000
     }
 });
 const server = app.server;
