@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Klystron</title>
+  <style>
+    html, body {
+      margin: 0;
+      min-height: 100vh;
+      background: #000;
+      color: #fff;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      padding: 24px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 3.2rem;
+      letter-spacing: -0.04em;
+    }
+    form {
+      width: 100%;
+      max-width: 640px;
+    }
+    input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      color: #fff;
+      font-size: 1rem;
+      outline: none;
+      box-sizing: border-box;
+    }
+    input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+    input:focus {
+      border-color: #8bf;
+      box-shadow: 0 0 0 4px rgba(136, 214, 255, 0.16);
+    }
+  </style>
+</head>
+<body>
+  <h1>Klystron</h1>
+  <form id="proxyForm">
+    <input id="targetUrl" name="targetUrl" type="text" placeholder="Enter a URL or search term" autocomplete="off" spellcheck="false" />
+  </form>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(function (error) {
+        console.error('Service worker registration failed:', error);
+      });
+    }
+
+    const form = document.getElementById('proxyForm');
+    const input = document.getElementById('targetUrl');
+
+    function isFullUrl(value) {
+      return /^https?:\/\//i.test(value.trim());
+    }
+
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+      const value = input.value.trim();
+      if (!value) return;
+
+      const target = isFullUrl(value)
+        ? value
+        : 'https://www.google.com/search?q=' + encodeURIComponent(value);
+
+      window.location.href = '/klystron?url=' + encodeURIComponent(target);
+    });
+  </script>
+</body>
+</html>
