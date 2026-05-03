@@ -18,15 +18,14 @@ self.addEventListener('fetch', event => {
 
     function getOriginalRemoteUrl(referrer) {
         if (!referrer || !referrer.startsWith(origin + '/klystron/')) return null;
+        
         const encoded = referrer.slice((origin + '/klystron/').length);
         try {
             return decodeURIComponent(encoded);
-        } catch {
+        } catch (e) {
             return null;
         }
     }
-
-    const requestReferrer = event.request.referrer || event.request.headers.get('referer');
 
     function proxyTo(urlString) {
         const encoded = encodeURIComponent(urlString);
@@ -37,30 +36,43 @@ self.addEventListener('fetch', event => {
             headers: event.request.headers,
             body: event.request.body,
             mode: 'same-origin',
-            credentials: 'same-origin'
+            credentials: 'same-origin',
+            redirect: 'follow'
         });
+
+        if (epoxy) {
+            return epoxy.fetch(proxyRequest);
+        }
 
         return fetch(proxyRequest);
     }
 
-    const proxiedPageUrl = getOriginalRemoteUrl(requestReferrer);
-
     if (requestUrl.origin === origin) {
         if (requestUrl.pathname.startsWith('/klystron/') || requestUrl.pathname === '/sw.js') {
-            return;
+            return; 
         }
-        if (proxiedPageUrl) {
+    }
+
+    const requestReferrer = event.request.referrer || event.request.headers.get('referer');
+    const proxiedPageUrl = getOriginalRemoteUrl(requestReferrer);
+
+    if (proxiedPageUrl) {
+        if (requestUrl.origin === origin) {
             try {
                 const remoteBase = new URL(proxiedPageUrl);
                 const target = new URL(requestUrl.pathname + requestUrl.search, remoteBase);
+                
                 event.respondWith(proxyTo(target.toString()));
                 return;
-            } catch {
+            } catch (err) {
+                console.error('Failed to resolve relative URL for proxy', err);
             }
         }
     }
-
     if (requestUrl.origin !== origin) {
         event.respondWith(proxyTo(event.request.url));
+        return;
     }
+
+    return; 
 });

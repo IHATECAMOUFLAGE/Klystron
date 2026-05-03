@@ -51,9 +51,21 @@
 </head>
 <body>
   <h1>Klystron</h1>
+
   <form id="proxyForm">
     <input id="targetUrl" name="targetUrl" type="text" placeholder="Enter a URL or search term" autocomplete="off" spellcheck="false" />
   </form>
+
+  <script type="module">
+    import { EpoxyClient } from "https://cdn.jsdelivr.net/npm/@mercuryworkshop/epoxy-transport/dist/index.mjs";
+
+    window.epoxy = new EpoxyClient({
+      wisp: "wss://wisp.mercurywork.shop/"
+    });
+
+    console.log("Epoxy client initialized");
+  </script>
+
   <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(function (error) {
